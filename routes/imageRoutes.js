@@ -10,21 +10,62 @@ const path = require("path");
 // ********** Archivo temporal para persistir datos dummy **********
 const dummyDataFile = path.join(__dirname, '../data/dummy-images.json');
 
+// ********** Datos iniciales para modo dummy (si no existe archivo) **********
+const initialDummyData = [
+  {
+    "_id": "dummy1754726998173",
+    "id": "dummy1754726998173",
+    "title": "Imagen de Ejemplo",
+    "urlImagen": "https://c.files.bbci.co.uk/14241/production/_111879428_pilares.jpg",
+    "url": "https://c.files.bbci.co.uk/14241/production/_111879428_pilares.jpg",
+    "date": new Date().toISOString(),
+    "description": "Esta es una imagen de ejemplo para el modo demo",
+    "colors": [
+      { "_rgb": [72, 84, 101, 1] },
+      { "_rgb": [196, 177, 148, 1] }
+    ],
+    "exif": {
+      "XResolution": 96,
+      "YResolution": 96,
+      "ResolutionUnit": "inches"
+    },
+    "user": {
+      "name": "Usuario de Prueba",
+      "email": "dummy@test.com"
+    }
+  }
+];
+
 // ********** Función para cargar datos dummy desde archivo **********
 function loadDummyImages() {
+  // Solo cargar en modo dummy
+  if (process.env.USE_DUMMY_AUTH !== 'true') {
+    return [];
+  }
+  
   try {
     if (fs.existsSync(dummyDataFile)) {
       const data = fs.readFileSync(dummyDataFile, 'utf8');
       return JSON.parse(data);
+    } else {
+      // Si no existe, crear con datos iniciales
+      console.log('📝 Creando nuevo archivo de datos dummy con imagen de ejemplo...');
+      saveDummyImages(initialDummyData);
+      return initialDummyData;
     }
   } catch (error) {
-    console.log('📝 Creando nuevo archivo de datos dummy...');
+    console.log('⚠️  Error al cargar datos dummy:', error.message);
+    return initialDummyData;
   }
-  return [];
 }
 
 // ********** Función para guardar datos dummy en archivo **********
 function saveDummyImages(images) {
+  // Solo guardar en modo dummy
+  if (process.env.USE_DUMMY_AUTH !== 'true') {
+    return;
+  }
+  
   try {
     // Crear directorio si no existe
     const dataDir = path.dirname(dummyDataFile);
@@ -201,6 +242,18 @@ router.get("/", async (req, res) => {
   try {
     // ******************** Buscamos todas las imagenes ********************
     const dataImage = await getImages();
+    
+    console.log('🔍 DEBUG HOME:');
+    console.log('Modo:', process.env.USE_DUMMY_AUTH === 'true' ? 'DUMMY' : 'PRODUCCIÓN');
+    console.log('Total imágenes:', dataImage.length);
+    if (dataImage.length > 0) {
+      console.log('Primera imagen:', {
+        id: dataImage[0]._id || dataImage[0].id,
+        title: dataImage[0].title,
+        hasUrl: !!dataImage[0].urlImagen
+      });
+    }
+    
     const renderData = getRenderObject(
       "Home",
       dataImage,

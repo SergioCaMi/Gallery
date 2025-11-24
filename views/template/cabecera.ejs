@@ -14,39 +14,47 @@
 <body>
     <header>
         <nav style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="color: #fff; font-weight: bold; font-size: 1.5rem;">
-                📸 Fototeca
+            <div class="logo-container">
+                <i class="fas fa-camera-retro"></i>
+                <span>Fototeca</span>
             </div>
             <ul>
                 <li>
-                    <button onclick="window.location.href='/'" title="Inicio">📷</button>
+                    <button onclick="window.location.href='/'" title="Inicio" class="nav-button">
+                        <i class="fas fa-home"></i>
+                    </button>
                 </li>
                 <% if (user) { %>
-
                     <li>
-                        <button onclick="window.location.href='/new-image'" title="Nueva imagen">➕</button>
+                        <button onclick="window.location.href='/new-image'" title="Nueva imagen" class="nav-button">
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
                     </li>
-                    <% } %>
-
-                        <li>
-                            <button onclick="showUtils()" title="Buscar">🔍</button>
-                        </li>
-                        <li>
-                            <% if (!user || !user.photo) { %>
-                                <button onclick="window.location.href='/auth/google'" title="Iniciar sesión">🔑</button>
-                                <% } %>
-                        </li>
-                        <li>
-                            <% if (user) { %>
-                                <button onclick="window.location.href='/logout'" title="Cerrar sesión">
-                                    <% if (user.photo && user.photo.trim() !=="" ) { %>
-                                        <img src="<%= user.photo %>" alt="Logout"
-                                            style="width: 28px; height: 28px; border-radius: 50%;">
-                                        <% } else { %>
-                                            <i class="fas fa-user" style="font-size: 1.2rem;"></i>
-                                            <% } %>
-                                </button>
-                                <% } %>
+                <% } %>
+                <li>
+                    <button onclick="showUtils()" title="Buscar" class="nav-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </li>
+                <% if (!user) { %>
+                    <li>
+                        <button onclick="window.location.href='/auth/google'" title="Iniciar sesión" class="nav-button login-btn">
+                            <i class="fab fa-google"></i>
+                            <span class="login-text">Login</span>
+                        </button>
+                    </li>
+                <% } else { %>
+                    <li>
+                        <button onclick="window.location.href='/logout'" title="Cerrar sesión" class="nav-button user-btn">
+                            <% if (user.photo && user.photo.trim() !== "") { %>
+                                <img src="<%= user.photo %>" alt="Usuario" class="user-avatar">
+                            <% } else { %>
+                                <i class="fas fa-user-circle"></i>
+                            <% } %>
+                            <i class="fas fa-sign-out-alt logout-icon"></i>
+                        </button>
+                    </li>
+                <% } %>
             </ul>
         </nav>
         <nav class="search" style="display: none; position: absolute; right: 150px; top: 40px;">

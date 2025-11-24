@@ -1,74 +1,94 @@
 <%- include("template/cabecera", {title: title, user: user }) %>
 
     <% if (dataImage.length===0) { %>
-        <div class="container">
-            <h2>
-                Puedes añadir tus imágenes en este botón:
-                <button onclick="window.location.href='/new-image'">➕</button>
-            </h2>
+        <div class="empty-gallery">
+            <div class="empty-content">
+                <i class="fas fa-images"></i>
+                <h2>No hay imágenes aún</h2>
+                <p>Comienza a crear tu galería añadiendo tu primera imagen</p>
+                <button class="btn-add-first" onclick="window.location.href='/new-image'">
+                    <i class="fas fa-plus-circle"></i> Añadir primera imagen
+                </button>
+            </div>
         </div>
-        <% } else { %>
-            <h3 style="margin-left: 100px;">
-                (<%= dataImage.length %> imágenes)
+    <% } else { %>
+        <div class="gallery-header">
+            <h3 class="gallery-count">
+                <i class="fas fa-images"></i> <%= dataImage.length %> <%= dataImage.length === 1 ? 'imagen' : 'imágenes' %>
             </h3>
+        </div>
 
-            <div class="gallery container">
-                <% dataImage.forEach(image=> { %>
-                    <div class="card" id="<%= image.id %>">
-                        <img src="<%= image.urlImagen %>" alt="<%= image.title %>">
-                        <div class="card-content">
-                            <h3 id="icons"
-                                style="display: flex; align-items: center; justify-content: space-between; padding: 5px;">
+        <div class="gallery container">
+            <% dataImage.forEach(image=> { %>
+                <div class="card-modern" id="<%= image.id %>">
+                    <div class="card-image-container">
+                        <img src="<%= image.urlImagen %>" alt="<%= image.title %>" class="card-image">
+                        <div class="card-overlay">
+                            <div class="card-actions">
                                 <% if (user) { %>
-                                    <i onclick="window.location.href='/image/<%= image.id %>/edit'"
-                                        title="Editar imagen" class="fas fa-edit edit-icon"></i>
-                                    <i onclick="downloadImage('<%= image.id %>')" title="Descargar imagen"
-                                        class="fas fa-arrow-alt-circle-down download-icon"></i>
-                                    <% } %>
-                                        <i onclick="window.location.href='/image/<%= image.id %>/view'"
-                                            title="Ver imagen" class="fas fa-eye view-icon"></i>
-                                        <% if (user) { %>
-                                            <i onclick="deleteImage('<%= image.id %>')" title="Eliminar imagen"
-                                                class="fas fa-trash delete-icon"></i>
-                                            <% } %>
-                            </h3>
-                            <h3 id="name">Nombre: <%= image.title.toUpperCase() %>
-                            </h3>
-                            <h5 id="date">Fecha: <%= image.date %>
-                            </h5>
-                            <h5 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"
-                                id="description">
-                                <%= image.description %>
-                            </h5>
-                            <h5 id="colors">Colores principales:</h5>
-                            <% if (image.colors && image.colors.length) { %>
-                                <div class="color-circles">
-
-                                    <% if (image.colors && image.colors.length) { %>
-                                        <div class="color-circles">
-                                            <% image.colors.forEach(function(color) { %>
-                                                <% let rgb=Array.isArray(color._rgb) ? color._rgb : [0, 0, 0, 1] %>
-                                                    <div class="color-circle"
-                                                        style="background-color: rgba(<%= rgb.join(',') %>);"
-                                                        title="rgba(<%= rgb.join(',') %>)">
-                                                    </div>
-                                                    <% }) %>
-                                        </div>
-                                        <% } %>
-                                </div>
-                                <% } else { %>
-                                    <p style="color: red;">Colores no disponibles en esta imagen.</p>
-                                    <% } %>
+                                    <button onclick="window.location.href='/image/<%= image.id %>/edit'" 
+                                        title="Editar" class="action-btn edit-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="downloadImage('<%= image.id %>')" 
+                                        title="Descargar" class="action-btn download-btn">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                <% } %>
+                                <button onclick="window.location.href='/image/<%= image.id %>/view'" 
+                                    title="Ver detalles" class="action-btn view-btn">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <% if (user) { %>
+                                    <button onclick="deleteImage('<%= image.id %>')" 
+                                        title="Eliminar" class="action-btn delete-btn">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
-                    <% }); %>
-            </div>
-            <% } %>
+                    <div class="card-content-modern">
+                        <div class="card-title">
+                            <i class="fas fa-image"></i>
+                            <span class="title-text"><%= image.title %></span>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-date">
+                                <i class="fas fa-calendar-alt"></i>
+                                <%= new Date(image.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                            </span>
+                        </div>
+                        <p class="card-description">
+                            <%= image.description || 'Sin descripción' %>
+                        </p>
+                        <div class="card-colors-section">
+                            <span class="colors-label">
+                                <i class="fas fa-palette"></i> Colores:
+                            </span>
+                            <% if (image.colors && image.colors.length) { %>
+                                <div class="color-circles-modern">
+                                    <% image.colors.slice(0, 5).forEach(function(color) { %>
+                                        <% let rgb = Array.isArray(color._rgb) ? color._rgb : [0, 0, 0, 1] %>
+                                        <div class="color-circle-modern"
+                                            style="background-color: rgba(<%= rgb.join(',') %>);"
+                                            title="rgba(<%= rgb.slice(0,3).join(', ') %>)">
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <span class="no-colors-text">No disponibles</span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
 
-                <%- include("template/footer", {title: title}) %>
-                    <script>
-                        var dataImage = JSON.parse(`<%- JSON.stringify(dataImage) %>`);
-                    </script>
-                    </body>
-
-                    </html>
+<%- include("template/footer", {title: title}) %>
+<script>
+    var dataImage = JSON.parse(`<%- JSON.stringify(dataImage) %>`);
+</script>
+</body>
+</html>

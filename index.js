@@ -16,6 +16,20 @@ console.log('🔧 Iniciando aplicación...');
 console.log('🔍 NODE_ENV:', process.env.NODE_ENV);
 console.log('🔍 USE_DUMMY_AUTH:', process.env.USE_DUMMY_AUTH);
 
+// Limpiar archivo dummy si estamos en modo producción
+const dummyFilePath = path.join(__dirname, 'data', 'dummy-images.json');
+if (process.env.USE_DUMMY_AUTH === 'false') {
+  if (fs.existsSync(dummyFilePath)) {
+    console.log('🗑️  Modo producción detectado: eliminando archivo dummy...');
+    try {
+      fs.unlinkSync(dummyFilePath);
+      console.log('✅ Archivo dummy eliminado correctamente');
+    } catch (error) {
+      console.error('⚠️  Error al eliminar archivo dummy:', error.message);
+    }
+  }
+}
+
 // Verificar si estamos en Render
 if (process.env.RENDER) {
   console.log('🌐 Detectado entorno Render');

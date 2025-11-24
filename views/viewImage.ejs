@@ -4,77 +4,167 @@
 <%- include("template/imageCard.ejs", { dataImage: dataImage }) %>
 
 <!-- Contenedor principal -->
-<div class="container details" style="display: flex; justify-content: center; padding: 2rem 1rem;">
-  <div style="width: 100%; max-width: 900px;">
+<div class="image-details-wrapper">
+  <div class="image-details-container-modern">
     <% if (dataImage && dataImage.length > 0) { %>
       <% const image = dataImage[0]; %>
 
-      <div class="custom-details-card">
-        <h3>Título: <%= image.title || 'Título no disponible' %></h3>
-        <p><strong>URL de la Imagen:</strong> <%= image.urlImagen || 'URL no disponible' %></p>
-        <p><strong>Fecha:</strong> <%= image.date ? new Date(image.date).toLocaleDateString() : 'Fecha no disponible' %></p>
-        <p><strong>Descripción:</strong> <%= image.description || 'Sin descripción' %></p>
-
-        <!-- Colores -->
-        <h5>Colores principales:</h5>
-        <% if (image.colors && image.colors.length) { %>
-          <div class="color-circles">
-            <% image.colors.forEach(function(color) { %>
-              <% let rgb = Array.isArray(color._rgb) ? color._rgb : [0, 0, 0, 1] %>
-              <div class="color-circle" style="background-color: rgba(<%= rgb.join(',') %>);" title="rgba(<%= rgb.join(',') %>)"></div>
-            <% }) %>
+      <!-- Información Principal -->
+      <div class="detail-card info-card">
+        <div class="card-header">
+          <i class="fas fa-info-circle"></i>
+          <h3>Información General</h3>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label"><i class="fas fa-heading"></i> Título:</span>
+            <span class="info-value"><%= image.title || 'Título no disponible' %></span>
           </div>
-        <% } else { %>
-          <p style="color: red;">Colores no disponibles en esta imagen.</p>
-        <% } %>
-
-        <!-- Datos EXIF -->
-        <h4>Datos EXIF</h4>
-        <% if (image.exif) { %>
-          <div class="exif-section">
-            <h5>Cámara</h5>
-            <p><strong>Fabricante:</strong> <%= image.exif.Make || 'No disponible' %></p>
-            <p><strong>Modelo:</strong> <%= image.exif.Model || 'No disponible' %></p>
-            <p><strong>Flash:</strong> <%= image.exif.Flash || 'No disponible' %></p>
-
-            <h5>Fechas</h5>
-            <p><strong>Fecha original:</strong> <%= image.exif.DateTimeOriginal || 'No disponible' %></p>
-            <p><strong>Creación:</strong> <%= image.exif.CreateDate || 'No disponible' %></p>
-            <p><strong>Modificación:</strong> <%= image.exif.ModifyDate || 'No disponible' %></p>
-
-            <h5>Parámetros de Disparo</h5>
-            <p><strong>Exposición:</strong> <%= image.exif.ExposureTime || 'No disponible' %>, F: <%= image.exif.FNumber || 'No disponible' %>, ISO: <%= image.exif.ISO || 'No disponible' %></p>
-            <p><strong>Longitud focal:</strong> <%= image.exif.FocalLength || 'No disponible' %> (<%= image.exif.FocalLengthIn35mmFormat || 'No disponible' %>)</p>
-
-            <h5>Otras propiedades</h5>
-            <p><strong>Balance de blancos:</strong> <%= image.exif.WhiteBalance || 'No disponible' %></p>
-            <p><strong>Método de medición:</strong> <%= image.exif.MeteringMode || 'No disponible' %></p>
-            <p><strong>Modo de exposición:</strong> <%= image.exif.ExposureMode || 'No disponible' %></p>
-
-            <h5>GPS</h5>
-            <% if (image.exif.latitude && image.exif.longitude) { %>
-              <p>
-                <a href="https://www.google.com/maps?q=<%= image.exif.latitude %>,<%= image.exif.longitude %>" target="_blank">
-                  Ver ubicación en Google Maps
-                </a>
-              </p>
-            <% } else { %>
-              <p>No hay datos GPS disponibles.</p>
-            <% } %>
+          <div class="info-row">
+            <span class="info-label"><i class="fas fa-calendar-alt"></i> Fecha:</span>
+            <span class="info-value"><%= image.date ? new Date(image.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Fecha no disponible' %></span>
           </div>
-        <% } else { %>
-          <p class="text-muted">Datos EXIF no disponibles.</p>
-        <% } %>
+          <div class="info-row">
+            <span class="info-label"><i class="fas fa-align-left"></i> Descripción:</span>
+            <span class="info-value"><%= image.description || 'Sin descripción' %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><i class="fas fa-link"></i> URL:</span>
+            <span class="info-value url-value"><%= image.urlImagen || 'URL no disponible' %></span>
+          </div>
+        </div>
       </div>
 
-      <div class="details-bottom">
-        <a href="/" class="btn btn-back">← Volver al inicio</a>
+      <!-- Colores -->
+      <div class="detail-card colors-card">
+        <div class="card-header">
+          <i class="fas fa-palette"></i>
+          <h3>Colores Principales</h3>
+        </div>
+        <div class="card-body">
+          <% if (image.colors && image.colors.length) { %>
+            <div class="color-grid">
+              <% image.colors.forEach(function(color) { %>
+                <% let rgb = Array.isArray(color._rgb) ? color._rgb : [0, 0, 0, 1] %>
+                <div class="color-item">
+                  <div class="color-circle-large" style="background-color: rgba(<%= rgb.join(',') %>);"></div>
+                  <span class="color-code">rgba(<%= rgb.slice(0,3).join(', ') %>)</span>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="no-data"><i class="fas fa-exclamation-triangle"></i> Colores no disponibles</p>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Datos EXIF -->
+      <div class="detail-card exif-card">
+        <div class="card-header">
+          <i class="fas fa-camera"></i>
+          <h3>Datos EXIF</h3>
+        </div>
+        <div class="card-body">
+          <% if (image.exif) { %>
+            <!-- Cámara -->
+            <div class="exif-section-modern">
+              <h5><i class="fas fa-camera-retro"></i> Cámara</h5>
+              <div class="exif-grid">
+                <div class="exif-item">
+                  <span class="exif-label">Fabricante:</span>
+                  <span class="exif-value"><%= image.exif.Make || 'N/A' %></span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">Modelo:</span>
+                  <span class="exif-value"><%= image.exif.Model || 'N/A' %></span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">Flash:</span>
+                  <span class="exif-value"><%= image.exif.Flash || 'N/A' %></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Parámetros de Disparo -->
+            <div class="exif-section-modern">
+              <h5><i class="fas fa-sliders-h"></i> Parámetros de Disparo</h5>
+              <div class="exif-grid">
+                <div class="exif-item">
+                  <span class="exif-label">Exposición:</span>
+                  <span class="exif-value"><%= image.exif.ExposureTime || 'N/A' %></span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">Apertura:</span>
+                  <span class="exif-value">f/<%= image.exif.FNumber || 'N/A' %></span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">ISO:</span>
+                  <span class="exif-value"><%= image.exif.ISO || 'N/A' %></span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">Longitud focal:</span>
+                  <span class="exif-value"><%= image.exif.FocalLength || 'N/A' %> mm</span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">Balance blancos:</span>
+                  <span class="exif-value"><%= image.exif.WhiteBalance || 'N/A' %></span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">Modo exposición:</span>
+                  <span class="exif-value"><%= image.exif.ExposureMode || 'N/A' %></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fechas -->
+            <div class="exif-section-modern">
+              <h5><i class="fas fa-clock"></i> Fechas</h5>
+              <div class="exif-grid">
+                <div class="exif-item">
+                  <span class="exif-label">Fecha original:</span>
+                  <span class="exif-value"><%= image.exif.DateTimeOriginal || 'N/A' %></span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">Creación:</span>
+                  <span class="exif-value"><%= image.exif.CreateDate || 'N/A' %></span>
+                </div>
+                <div class="exif-item">
+                  <span class="exif-label">Modificación:</span>
+                  <span class="exif-value"><%= image.exif.ModifyDate || 'N/A' %></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- GPS -->
+            <% if (image.exif.latitude && image.exif.longitude) { %>
+              <div class="exif-section-modern">
+                <h5><i class="fas fa-map-marker-alt"></i> Ubicación GPS</h5>
+                <a href="https://www.google.com/maps?q=<%= image.exif.latitude %>,<%= image.exif.longitude %>" target="_blank" class="gps-link">
+                  <i class="fas fa-external-link-alt"></i> Ver en Google Maps
+                  <span class="coordinates">(<%= image.exif.latitude.toFixed(6) %>, <%= image.exif.longitude.toFixed(6) %>)</span>
+                </a>
+              </div>
+            <% } %>
+          <% } else { %>
+            <p class="no-data"><i class="fas fa-exclamation-triangle"></i> Datos EXIF no disponibles</p>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Botón volver -->
+      <div class="details-bottom-modern">
+        <a href="/" class="btn-back-modern">
+          <i class="fas fa-arrow-left"></i> Volver al inicio
+        </a>
       </div>
 
     <% } else { %>
-      <div class="no-image">
-        <h2>Imagen no encontrada.</h2>
-        <a href="/" class="btn btn-back">← Volver al inicio</a>
+      <div class="no-image-modern">
+        <i class="fas fa-image"></i>
+        <h2>Imagen no encontrada</h2>
+        <a href="/" class="btn-back-modern">
+          <i class="fas fa-arrow-left"></i> Volver al inicio
+        </a>
       </div>
     <% } %>
   </div>
