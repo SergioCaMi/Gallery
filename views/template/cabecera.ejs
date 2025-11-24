@@ -31,10 +31,42 @@
                         </button>
                     </li>
                 <% } %>
-                <li>
-                    <button onclick="showUtils()" title="Buscar" class="nav-button">
+                <li class="search-menu-container">
+                    <button onclick="toggleSearch()" title="Buscar" class="nav-button search-toggle-btn">
                         <i class="fas fa-search"></i>
                     </button>
+                    <!-- Menú desplegable de búsqueda -->
+                    <div class="search-dropdown" id="searchDropdown">
+                        <div class="search-dropdown-header">
+                            <h4><i class="fas fa-filter"></i> Filtros</h4>
+                        </div>
+                        <div class="search-dropdown-body">
+                            <div class="search-field-compact">
+                                <label for="searchInput">
+                                    <i class="fas fa-signature"></i> Nombre
+                                </label>
+                                <input type="text" id="searchInput" class="searchInput modern-input-compact" 
+                                       placeholder="Buscar...">
+                            </div>
+                            <div class="search-field-compact">
+                                <label for="dateInput">
+                                    <i class="fas fa-calendar-alt"></i> Desde
+                                </label>
+                                <input type="date" id="dateInput" class="dateInput modern-input-compact">
+                            </div>
+                            <div class="search-field-compact">
+                                <label for="dateInputEnd">
+                                    <i class="fas fa-calendar-check"></i> Hasta
+                                </label>
+                                <input type="date" id="dateInputEnd" class="dateInputEnd modern-input-compact" 
+                                       value="<%= new Date().toISOString().slice(0,10) %>">
+                            </div>
+                            <button onclick="clearSearch()" class="btn-clear-compact">
+                                <i class="fas fa-redo"></i> Limpiar
+                            </button>
+                            <div class="search-results-count-compact" id="resultsCount"></div>
+                        </div>
+                    </div>
                 </li>
                 <% if (!user) { %>
                     <li>
@@ -56,17 +88,6 @@
                     </li>
                 <% } %>
             </ul>
-        </nav>
-        <nav class="search" style="display: none; position: absolute; right: 150px; top: 40px;">
-            <div>
-                <h6 style="margin: 0;">Buscar por nombre</h6>
-                <input type="text" class="searchInput" placeholder="Buscar...">
-            </div>
-            <div>
-                <h6 style="margin: 0;">Buscar desde la fecha... </h6>
-                <input type="date" class="dateInput" title="Buscar por fecha">
-                <h6 style="margin: 0;">... hasta hoy <%= new Date().toISOString().slice(0,10) %> </h6>
-            </div>
         </nav>
     </header>
 

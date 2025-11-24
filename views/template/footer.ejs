@@ -31,8 +31,6 @@
         }
     }
 
-
-
     /**
      * Descarga una imagen al directorio /downloads
      *
@@ -60,67 +58,115 @@
     }
 
     /**
-     * Muestra u oculta los elementos de búsqueda y filtra las imágenes según el texto de búsqueda o la fecha.
-     *
-     * @function showUtils
-     * @description Muestra los elementos que cumplen las condiciones dadas por el usuario
-     * @returns {}
+     * Toggle para mostrar/ocultar el menú desplegable de búsqueda
      */
-    function showUtils() {
-        const searchUtils = document.querySelector(".search");
-        const inputSearch = document.querySelector(".searchInput");
-        const cards = document.querySelectorAll(".card");
-        const inputDateSearch = document.querySelector(".dateInput");
-        // Mostrar/Ocultar búsqueda
-        if (searchUtils.style.display === "flex") {
-            searchUtils.style.display = "none";
-            inputSearch.value = "";
-        } else {
-            searchUtils.style.display = "flex";
+    function toggleSearch() {
+        const dropdown = document.getElementById('searchDropdown');
+        const toggleBtn = document.querySelector('.search-toggle-btn');
+        
+        dropdown.classList.toggle('active');
+        toggleBtn.classList.toggle('active');
+    }
+
+    // Cerrar menú al hacer click fuera
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('searchDropdown');
+        const toggleBtn = document.querySelector('.search-toggle-btn');
+        const searchContainer = document.querySelector('.search-menu-container');
+        
+        if (dropdown && !searchContainer.contains(event.target)) {
+            dropdown.classList.remove('active');
+            toggleBtn.classList.remove('active');
         }
+    });
+
+    /**
+     * Limpia los filtros de búsqueda
+     */
+    function clearSearch() {
+        const inputSearch = document.querySelector(".searchInput");
+        const inputDateStart = document.querySelector(".dateInput");
+        const inputDateEnd = document.querySelector(".dateInputEnd");
+        
+        if (inputSearch) inputSearch.value = "";
+        if (inputDateStart) inputDateStart.value = "";
+        if (inputDateEnd) inputDateEnd.value = new Date().toISOString().slice(0,10);
+        
+        filterCards();
     }
 
     // BÚSQUEDA REACTIVA POR TÍTULO Y/O FECHA
     (function () {
         const inputSearch = document.querySelector(".searchInput");
-        const inputDateSearch = document.querySelector(".dateInput");
-        const cards = document.querySelectorAll(".card");
-        if (!inputSearch || !inputDateSearch || !cards.length) return;
+        const inputDateStart = document.querySelector(".dateInput");
+        const inputDateEnd = document.querySelector(".dateInputEnd");
+        const cards = document.querySelectorAll(".card-modern, .card");
+        const resultsCount = document.getElementById("resultsCount");
+        
+        if (!inputSearch || !cards.length) return;
 
         function filterCards() {
             const searchText = inputSearch.value.toLowerCase();
-            const dateValue = inputDateSearch.value;
+            const dateStartValue = inputDateStart ? inputDateStart.value : "";
+            const dateEndValue = inputDateEnd ? inputDateEnd.value : "";
+            let visibleCount = 0;
+
             cards.forEach((card) => {
-                const nameElem = card.querySelector("#name");
-                if (!nameElem) {
+                // Buscar título en la nueva estructura o antigua
+                const titleElem = card.querySelector(".title-text, #name");
+                if (!titleElem) {
                     card.style.display = "none";
                     return;
                 }
-                const cardTitle = nameElem.textContent.replace('Nombre:', '').trim().toLowerCase();
-                let matchesTitle = cardTitle.includes(searchText);
+                
+                const cardTitle = titleElem.textContent.replace('Nombre:', '').trim().toLowerCase();
+                let matchesTitle = !searchText || cardTitle.includes(searchText);
                 let matchesDate = true;
-                if (dateValue) {
-                    const searchDate = new Date(dateValue);
-                    const currentDate = new Date();
-                    const imageDateElem = card.querySelector("#date");
+
+                // Solo filtrar por fecha si se ha especificado una fecha de inicio
+                if (dateStartValue) {
+                    const searchDateStart = new Date(dateStartValue);
+                    const searchDateEnd = dateEndValue ? new Date(dateEndValue) : new Date();
+                    
+                    // Ajustar al final del día para incluir todo el día final
+                    searchDateEnd.setHours(23, 59, 59, 999);
+                    
+                    const imageDateElem = card.querySelector(".card-date, #date");
+                    
                     if (imageDateElem) {
-                        const imageDate = new Date(imageDateElem.textContent.replace('Fecha:', '').trim());
-                        matchesDate = imageDate >= searchDate && imageDate <= currentDate;
+                        const dateText = imageDateElem.textContent.replace('Fecha:', '').trim();
+                        const imageDate = new Date(dateText);
+                        matchesDate = imageDate >= searchDateStart && imageDate <= searchDateEnd;
                     } else {
                         matchesDate = false;
                     }
                 }
+
                 if (matchesTitle && matchesDate) {
-                    card.style.display = "flex";
+                    card.style.display = "";
+                    visibleCount++;
                 } else {
                     card.style.display = "none";
                 }
             });
+
+            // Actualizar contador de resultados - siempre visible
+            if (resultsCount) {
+                resultsCount.textContent = `${visibleCount} ${visibleCount === 1 ? 'resultado' : 'resultados'}`;
+            }
         }
 
-        inputSearch.addEventListener("input", filterCards);
-        inputDateSearch.addEventListener("input", filterCards);
+        // Hacer filterCards accesible globalmente
+        window.filterCards = filterCards;
+
+        // Inicializar contador al cargar
+        filterCards();
+
+        if (inputSearch) inputSearch.addEventListener("input", filterCards);
+        if (inputDateStart) inputDateStart.addEventListener("input", filterCards);
+        if (inputDateEnd) inputDateEnd.addEventListener("input", filterCards);
     })();
+</script>
 
 
 
